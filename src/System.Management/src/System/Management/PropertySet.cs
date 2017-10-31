@@ -69,10 +69,12 @@ namespace System.Management
         /// <value>
         ///    <para>The number of objects in the collection.</para>
         /// </value>
-        public int Count 
+        public int Count
         {
-            get {
-                string[] propertyNames = null; object qualVal = null;
+            get
+            {
+                string[] propertyNames = null;
+                object qualVal = null;
                 int flag;
                 if (isSystem)
                     flag = (int)tag_WBEM_CONDITION_FLAG_TYPE.WBEM_FLAG_SYSTEM_ONLY;
@@ -102,7 +104,9 @@ namespace System.Management
         /// <para><see langword='true'/> if the object is synchronized; 
         ///    otherwise, <see langword='false'/>.</para>
         /// </value>
-        public bool IsSynchronized { get { return false; } 
+        public bool IsSynchronized
+        {
+            get { return false; }
         }
 
         /// <summary>
@@ -111,7 +115,9 @@ namespace System.Management
         /// <value>
         ///    <para>The object to be used for synchronization.</para>
         /// </value>
-        public object SyncRoot { get { return this; } 
+        public object SyncRoot
+        {
+            get { return this; }
         }
 
         /// <overload>
@@ -122,7 +128,7 @@ namespace System.Management
         /// </summary>
         /// <param name='array'>The array to which to copy the <see cref='System.Management.PropertyDataCollection'/>. </param>
         /// <param name='index'>The index from which to start copying. </param>
-        public void CopyTo(Array array, Int32 index) 
+        public void CopyTo(Array array, Int32 index)
         {
             if (null == array)
                 throw new ArgumentNullException("array");
@@ -139,15 +145,15 @@ namespace System.Management
                 flag |= (int)tag_WBEM_CONDITION_FLAG_TYPE.WBEM_FLAG_SYSTEM_ONLY;
             else
                 flag |= (int)tag_WBEM_CONDITION_FLAG_TYPE.WBEM_FLAG_NONSYSTEM_ONLY;
-                
+
             flag |= (int)tag_WBEM_CONDITION_FLAG_TYPE.WBEM_FLAG_ALWAYS;
-                
+
             int status = this.parent.wbemObject.GetNames_(null, flag, ref dummy, out nameArray);
 
             if (status >= 0)
             {
                 if ((index + nameArray.Length) > array.Length)
-                    throw new ArgumentException(null,"index");
+                    throw new ArgumentException(null, "index");
 
                 foreach (string propertyName in nameArray)
                     array.SetValue(new PropertyData(parent, propertyName), index++);
@@ -172,7 +178,7 @@ namespace System.Management
         /// <param name=' index'>The index in the destination array from which to start copying.</param>
         public void CopyTo(PropertyData[] propertyArray, Int32 index)
         {
-            CopyTo((Array)propertyArray, index);	
+            CopyTo((Array)propertyArray, index);
         }
         //
         // IEnumerable
@@ -247,8 +253,10 @@ namespace System.Management
             internal PropertyDataEnumerator(ManagementBaseObject parent, bool isSystem)
             {
                 this.parent = parent;
-                propertyNames = null; index = -1;
-                int flag; object qualVal = null;
+                propertyNames = null;
+                index = -1;
+                int flag;
+                object qualVal = null;
 
                 if (isSystem)
                     flag = (int)tag_WBEM_CONDITION_FLAG_TYPE.WBEM_FLAG_SYSTEM_ONLY;
@@ -267,7 +275,7 @@ namespace System.Management
                         Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
                 }
             }
-        
+
             /// <internalonly/>
             object IEnumerator.Current { get { return (object)this.Current; } }
 
@@ -278,9 +286,10 @@ namespace System.Management
             ///    The current <see cref='System.Management.PropertyData'/>
             ///    element in the collection.
             /// </value>
-            public PropertyData Current 
+            public PropertyData Current
             {
-                get {
+                get
+                {
                     if ((index == -1) || (index == propertyNames.Length))
                         throw new InvalidOperationException();
                     else
@@ -313,7 +322,7 @@ namespace System.Management
             {
                 index = -1;
             }
-            
+
         }//PropertyDataEnumerator
 
 
@@ -338,9 +347,10 @@ namespace System.Management
         /// Console.WriteLine("Free space on C: drive is: " &amp; c.Properties("FreeSpace").Value)
         ///    </code>
         /// </example>
-        public virtual PropertyData this[string propertyName] 
+        public virtual PropertyData this[string propertyName]
         {
-            get { 
+            get
+            {
                 if (null == propertyName)
                     throw new ArgumentNullException("propertyName");
 
@@ -470,7 +480,7 @@ namespace System.Management
                     Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
             }
         }
-        
+
         /// <summary>
         /// <para>Adds a new <see cref='System.Management.PropertyData'/> with no assigned value.</para>
         /// </summary>
@@ -491,8 +501,8 @@ namespace System.Management
             if (parent.GetType() == typeof(ManagementObject)) //can't add properties to instance
                 throw new InvalidOperationException();
 
-            int wmiCimType = (int)propertyType;  
-            
+            int wmiCimType = (int)propertyType;
+
             if (isArray)
                 wmiCimType = (wmiCimType | (int)tag_CIMTYPE_ENUMERATION.CIM_FLAG_ARRAY);
 
@@ -508,6 +518,6 @@ namespace System.Management
                     Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
             }
         }
-        
+
     }//PropertyDataCollection
 }

@@ -68,7 +68,7 @@ namespace System.Management
         private ManagementScope scope;
         private ObjectQuery query;
         private EnumerationOptions options;
-        
+
         //default constructor
         /// <overload>
         ///    Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class.
@@ -84,8 +84,8 @@ namespace System.Management
         ///    <code lang='VB'>Dim s As New ManagementObjectSearcher()
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher() : this((ManagementScope)null, null, null) {}
-        
+        public ManagementObjectSearcher() : this((ManagementScope)null, null, null) { }
+
         //parameterized constructors
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class used 
@@ -99,7 +99,7 @@ namespace System.Management
         ///    <code lang='VB'>Dim s As New ManagementObjectSearcher("SELECT * FROM Win32_Service")
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher(string queryString) : this(null, new ObjectQuery(queryString), null) {}
+        public ManagementObjectSearcher(string queryString) : this(null, new ObjectQuery(queryString), null) { }
 
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class used to invoke the 
@@ -114,7 +114,7 @@ namespace System.Management
         /// Dim s As New ManagementObjectSearcher(q)
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher(ObjectQuery query) : this (null, query, null) {} 
+        public ManagementObjectSearcher(ObjectQuery query) : this(null, query, null) { }
 
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class used to invoke the
@@ -135,8 +135,9 @@ namespace System.Management
         ///                                "SELECT * FROM MyClass WHERE MyProp=5")
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher(string scope, string queryString) : 
-            this(new ManagementScope(scope), new ObjectQuery(queryString), null) {}
+        public ManagementObjectSearcher(string scope, string queryString) :
+            this(new ManagementScope(scope), new ObjectQuery(queryString), null)
+        { }
 
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class used to invoke the 
@@ -158,7 +159,7 @@ namespace System.Management
         /// Dim s As New ManagementObjectSearcher(myScope,q)
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher(ManagementScope scope, ObjectQuery query) : this(scope, query, null) {}
+        public ManagementObjectSearcher(ManagementScope scope, ObjectQuery query) : this(scope, query, null) { }
 
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class used to invoke the specified
@@ -180,7 +181,8 @@ namespace System.Management
         ///    </code>
         /// </example>
         public ManagementObjectSearcher(string scope, string queryString, EnumerationOptions options) :
-            this(new ManagementScope(scope), new ObjectQuery(queryString), options) {}
+            this(new ManagementScope(scope), new ObjectQuery(queryString), options)
+        { }
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementObjectSearcher'/> class to be
         ///    used to invoke the specified query in the specified scope, with the specified
@@ -201,7 +203,7 @@ namespace System.Management
         /// Dim s As New ManagementObjectSearcher(scope, q, o)
         ///    </code>
         /// </example>
-        public ManagementObjectSearcher(ManagementScope scope, ObjectQuery query, EnumerationOptions options) 
+        public ManagementObjectSearcher(ManagementScope scope, ObjectQuery query, EnumerationOptions options)
         {
             this.scope = ManagementScope._Clone(scope);
 
@@ -216,7 +218,7 @@ namespace System.Management
                 this.options = new EnumerationOptions();
         }
 
-    
+
         //
         //Public Properties
         //
@@ -241,18 +243,18 @@ namespace System.Management
         /// s.Scope = ms
         ///    </code>
         /// </example>
-        public ManagementScope Scope 
+        public ManagementScope Scope
         {
-            get 
-            { 
-                return scope; 
-            } 
-            set 
+            get
+            {
+                return scope;
+            }
+            set
             {
                 if (null != value)
-                    scope = (ManagementScope) value.Clone ();
+                    scope = (ManagementScope)value.Clone();
                 else
-                    throw new ArgumentNullException ("value");
+                    throw new ArgumentNullException("value");
             }
         }
 
@@ -267,18 +269,18 @@ namespace System.Management
         /// <para>When the value of this property is changed, the <see cref='System.Management.ManagementObjectSearcher'/> 
         /// is reset to use the new query.</para>
         /// </remarks>
-        public ObjectQuery Query 
+        public ObjectQuery Query
         {
-            get 
-            { 
-                return query; 
-            } 
-            set 
-            { 
+            get
+            {
+                return query;
+            }
+            set
+            {
                 if (null != value)
-                    query = (ObjectQuery)value.Clone ();
+                    query = (ObjectQuery)value.Clone();
                 else
-                    throw new ArgumentNullException ("value");
+                    throw new ArgumentNullException("value");
             }
         }
 
@@ -288,19 +290,19 @@ namespace System.Management
         /// <value>
         ///    <para>The options for how to search for objects.</para>
         /// </value>
-        public EnumerationOptions Options 
-        { 
-            get 
-            { 
-                return options; 
-            } 
-            set 
-            { 
+        public EnumerationOptions Options
+        {
+            get
+            {
+                return options;
+            }
+            set
+            {
                 if (null != value)
-                    options = (EnumerationOptions) value.Clone ();
+                    options = (EnumerationOptions)value.Clone();
                 else
                     throw new ArgumentNullException("value");
-            } 
+            }
         }
 
         //********************************************
@@ -319,30 +321,31 @@ namespace System.Management
         /// </returns>
         public ManagementObjectCollection Get()
         {
-            Initialize ();
+            Initialize();
             IEnumWbemClassObject ew = null;
             SecurityHandler securityHandler = scope.GetSecurityHandler();
             EnumerationOptions enumOptions = (EnumerationOptions)options.Clone();
 
             int status = (int)ManagementStatus.NoError;
 
-            try 
+            try
             {
                 //If this is a simple SelectQuery (className only), and the enumerateDeep is set, we have
                 //to find out whether this is a class enumeration or instance enumeration and call CreateInstanceEnum/
                 //CreateClassEnum appropriately, because with ExecQuery we can't do a deep enumeration.
-                if ((query.GetType() == typeof(SelectQuery)) && 
-                    (((SelectQuery)query).Condition == null) && 
+                if ((query.GetType() == typeof(SelectQuery)) &&
+                    (((SelectQuery)query).Condition == null) &&
                     (((SelectQuery)query).SelectedProperties == null) &&
                     (options.EnumerateDeep == true))
                 {
                     //Need to make sure that we're not passing invalid flags to enumeration APIs.
                     //The only flags not valid for enumerations are EnsureLocatable & PrototypeOnly.
-                    enumOptions.EnsureLocatable = false; enumOptions.PrototypeOnly = false;
-                    
+                    enumOptions.EnsureLocatable = false;
+                    enumOptions.PrototypeOnly = false;
+
                     if (((SelectQuery)query).IsSchemaQuery == false) //deep instance enumeration
                     {
-                        status = scope.GetSecuredIWbemServicesHandler( scope.GetIWbemServices()  ).CreateInstanceEnum_(
+                        status = scope.GetSecuredIWbemServicesHandler(scope.GetIWbemServices()).CreateInstanceEnum_(
                             ((SelectQuery)query).ClassName,
                             enumOptions.Flags,
                             enumOptions.GetContext(),
@@ -350,29 +353,29 @@ namespace System.Management
                     }
                     else //deep class enumeration
                     {
-                        status = scope.GetSecuredIWbemServicesHandler(scope.GetIWbemServices() ).CreateClassEnum_(((SelectQuery)query).ClassName,
+                        status = scope.GetSecuredIWbemServicesHandler(scope.GetIWbemServices()).CreateClassEnum_(((SelectQuery)query).ClassName,
                             enumOptions.Flags,
                             enumOptions.GetContext(),
-                            ref ew );
+                            ref ew);
                     }
                 }
                 else //we can use ExecQuery
                 {
                     //Make sure the EnumerateDeep flag bit is turned off because it's invalid for queries
                     enumOptions.EnumerateDeep = true;
-                    status = scope.GetSecuredIWbemServicesHandler(scope.GetIWbemServices() ).ExecQuery_(
+                    status = scope.GetSecuredIWbemServicesHandler(scope.GetIWbemServices()).ExecQuery_(
                         query.QueryLanguage,
                         query.QueryString,
-                        enumOptions.Flags, 
+                        enumOptions.Flags,
                         enumOptions.GetContext(),
-                        ref ew );
+                        ref ew);
                 }
-            }   
-            catch (COMException e) 
+            }
+            catch (COMException e)
             {
                 ManagementException.ThrowWithExtendedInfo(e);
-            } 
-            finally 
+            }
+            finally
             {
                 securityHandler.Reset();
             }
@@ -402,11 +405,11 @@ namespace System.Management
         public void Get(ManagementOperationObserver watcher)
         {
             if (null == watcher)
-                throw new ArgumentNullException ("watcher");
+                throw new ArgumentNullException("watcher");
 
-            Initialize ();
-            IWbemServices wbemServices = scope.GetIWbemServices ();
-            
+            Initialize();
+            IWbemServices wbemServices = scope.GetIWbemServices();
+
             EnumerationOptions enumOptions = (EnumerationOptions)options.Clone();
             // Ensure we switch off ReturnImmediately as this is invalid for async calls
             enumOptions.ReturnImmediately = false;
@@ -414,37 +417,38 @@ namespace System.Management
             if (watcher.HaveListenersForProgress)
                 enumOptions.SendStatus = true;
 
-            WmiEventSink sink = watcher.GetNewSink (scope, enumOptions.Context);
+            WmiEventSink sink = watcher.GetNewSink(scope, enumOptions.Context);
             SecurityHandler securityHandler = scope.GetSecurityHandler();
 
             int status = (int)ManagementStatus.NoError;
 
-            try 
+            try
             {
                 //If this is a simple SelectQuery (className only), and the enumerateDeep is set, we have
                 //to find out whether this is a class enumeration or instance enumeration and call CreateInstanceEnum/
                 //CreateClassEnum appropriately, because with ExecQuery we can't do a deep enumeration.
-                if ((query.GetType() == typeof(SelectQuery)) && 
-                    (((SelectQuery)query).Condition == null) && 
+                if ((query.GetType() == typeof(SelectQuery)) &&
+                    (((SelectQuery)query).Condition == null) &&
                     (((SelectQuery)query).SelectedProperties == null) &&
                     (options.EnumerateDeep == true))
                 {
                     //Need to make sure that we're not passing invalid flags to enumeration APIs.
                     //The only flags not valid for enumerations are EnsureLocatable & PrototypeOnly.
-                    enumOptions.EnsureLocatable = false; enumOptions.PrototypeOnly = false;
-                    
+                    enumOptions.EnsureLocatable = false;
+                    enumOptions.PrototypeOnly = false;
+
                     if (((SelectQuery)query).IsSchemaQuery == false) //deep instance enumeration
                     {
-                        status = scope.GetSecuredIWbemServicesHandler( wbemServices ).CreateInstanceEnumAsync_(((SelectQuery)query).ClassName, 
-                            enumOptions.Flags, 
-                            enumOptions.GetContext(), 
+                        status = scope.GetSecuredIWbemServicesHandler(wbemServices).CreateInstanceEnumAsync_(((SelectQuery)query).ClassName,
+                            enumOptions.Flags,
+                            enumOptions.GetContext(),
                             sink.Stub);
                     }
-                    else    
+                    else
                     {
-                        status = scope.GetSecuredIWbemServicesHandler( wbemServices ).CreateClassEnumAsync_(((SelectQuery)query).ClassName, 
-                            enumOptions.Flags, 
-                            enumOptions.GetContext(), 
+                        status = scope.GetSecuredIWbemServicesHandler(wbemServices).CreateClassEnumAsync_(((SelectQuery)query).ClassName,
+                            enumOptions.Flags,
+                            enumOptions.GetContext(),
                             sink.Stub);
                     }
                 }
@@ -452,21 +456,21 @@ namespace System.Management
                 {
                     //Make sure the EnumerateDeep flag bit is turned off because it's invalid for queries
                     enumOptions.EnumerateDeep = true;
-                    status = scope.GetSecuredIWbemServicesHandler( wbemServices ).ExecQueryAsync_(
-                        query.QueryLanguage, 
-                        query.QueryString, 
-                        enumOptions.Flags, 
-                        enumOptions.GetContext(), 
+                    status = scope.GetSecuredIWbemServicesHandler(wbemServices).ExecQueryAsync_(
+                        query.QueryLanguage,
+                        query.QueryString,
+                        enumOptions.Flags,
+                        enumOptions.GetContext(),
                         sink.Stub);
                 }
 
-            } 
-            catch (COMException e) 
+            }
+            catch (COMException e)
             {
-                watcher.RemoveSink (sink);
-                ManagementException.ThrowWithExtendedInfo (e);
-            } 
-            finally 
+                watcher.RemoveSink(sink);
+                ManagementException.ThrowWithExtendedInfo(e);
+            }
+            finally
             {
                 securityHandler.Reset();
             }

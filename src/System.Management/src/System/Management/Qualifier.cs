@@ -55,7 +55,7 @@ namespace System.Management
         private int qualifierFlavor;
         private IWbemQualifierSetFreeThreaded qualifierSet;
 
-        internal QualifierData(ManagementBaseObject parent, string propName, string qualName, QualifierType type)		
+        internal QualifierData(ManagementBaseObject parent, string propName, string qualName, QualifierType type)
         {
             this.parent = parent;
             this.propertyOrMethodName = propName;
@@ -70,17 +70,18 @@ namespace System.Management
             int status = (int)ManagementStatus.Failed;
 
             qualifierSet = null;
-            switch (qualifierType) {
-                case QualifierType.ObjectQualifier :
+            switch (qualifierType)
+            {
+                case QualifierType.ObjectQualifier:
                     status = parent.wbemObject.GetQualifierSet_(out qualifierSet);
                     break;
-                case QualifierType.PropertyQualifier :
+                case QualifierType.PropertyQualifier:
                     status = parent.wbemObject.GetPropertyQualifierSet_(propertyOrMethodName, out qualifierSet);
                     break;
-                case QualifierType.MethodQualifier :
+                case QualifierType.MethodQualifier:
                     status = parent.wbemObject.GetMethodQualifierSet_(propertyOrMethodName, out qualifierSet);
                     break;
-                default :
+                default:
                     throw new ManagementException(ManagementStatus.Unexpected, null, null); //is this the best fit error ??
             }
 
@@ -116,27 +117,27 @@ namespace System.Management
 
                         if (elementType == typeof(Int32))
                         {
-                            wmiValue = new Int32 [length];
+                            wmiValue = new Int32[length];
                             for (int i = 0; i < length; i++)
-                                ((Int32[])(wmiValue))[i] = Convert.ToInt32(valArray.GetValue(i),(IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Int32)));
+                                ((Int32[])(wmiValue))[i] = Convert.ToInt32(valArray.GetValue(i), (IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Int32)));
                         }
                         else if (elementType == typeof(Double))
                         {
-                            wmiValue = new Double [length];
+                            wmiValue = new Double[length];
                             for (int i = 0; i < length; i++)
-                                ((Double[])(wmiValue))[i] = Convert.ToDouble(valArray.GetValue(i),(IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Double)));
+                                ((Double[])(wmiValue))[i] = Convert.ToDouble(valArray.GetValue(i), (IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Double)));
                         }
                         else if (elementType == typeof(String))
                         {
-                            wmiValue = new String [length];
+                            wmiValue = new String[length];
                             for (int i = 0; i < length; i++)
                                 ((String[])(wmiValue))[i] = (valArray.GetValue(i)).ToString();
                         }
                         else if (elementType == typeof(Boolean))
                         {
-                            wmiValue = new Boolean [length];
+                            wmiValue = new Boolean[length];
                             for (int i = 0; i < length; i++)
-                                ((Boolean[])(wmiValue))[i] = Convert.ToBoolean(valArray.GetValue(i),(IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Boolean)));
+                                ((Boolean[])(wmiValue))[i] = Convert.ToBoolean(valArray.GetValue(i), (IFormatProvider)CultureInfo.InvariantCulture.GetFormat(typeof(System.Boolean)));
                         }
                         else
                             wmiValue = valArray; //should this throw ?
@@ -156,7 +157,7 @@ namespace System.Management
         /// <value>
         ///    <para>The name of the qualifier.</para>
         /// </value>
-        public string Name 
+        public string Name
         {
             get { return qualifierName != null ? qualifierName : ""; }
         }
@@ -175,20 +176,22 @@ namespace System.Management
         ///    <see langword='bool'/>.
         ///       </para>
         /// </remarks>
-        public Object Value 
+        public Object Value
         {
-            get { 
+            get
+            {
                 RefreshQualifierInfo();
-                return ValueTypeSafety.GetSafeObject(qualifierValue); 
+                return ValueTypeSafety.GetSafeObject(qualifierValue);
             }
-            set {
+            set
+            {
                 int status = (int)ManagementStatus.NoError;
 
                 RefreshQualifierInfo();
                 object newValue = MapQualValueToWmiValue(value);
-                    
-                status = qualifierSet.Put_(qualifierName, ref newValue, 
-                    qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN);  
+
+                status = qualifierSet.Put_(qualifierName, ref newValue,
+                    qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN);
 
                 if ((status & 0xfffff000) == 0x80041000)
                     ManagementException.ThrowWithExtendedInfo((ManagementStatus)status);
@@ -210,18 +213,19 @@ namespace System.Management
         ///       reside in separate namespaces in WMI and can be merged into the basic class
         ///       definition when retrieved.</para>
         /// </remarks>
-        public bool IsAmended 
+        public bool IsAmended
         {
-            get { 
-                RefreshQualifierInfo(); 
+            get
+            {
+                RefreshQualifierInfo();
                 return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_AMENDED ==
                     (qualifierFlavor & (int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_AMENDED));
             }
-            set 
+            set
             {
                 int status = (int)ManagementStatus.NoError;
 
-                RefreshQualifierInfo ();
+                RefreshQualifierInfo();
                 // Mask out origin bits 
                 int flavor = qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN;
 
@@ -247,9 +251,10 @@ namespace System.Management
         /// <para><see langword='true'/> if the qualifier has been defined 
         ///    locally on this class; otherwise, <see langword='false'/>. </para>
         /// </value>
-        public bool IsLocal 
+        public bool IsLocal
         {
-            get {
+            get
+            {
                 RefreshQualifierInfo();
                 return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_ORIGIN_LOCAL ==
                     (qualifierFlavor & (int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN));
@@ -264,17 +269,19 @@ namespace System.Management
         /// <para><see langword='true'/> if this qualifier should be 
         ///    propagated to instances of the class; otherwise, <see langword='false'/>.</para>
         /// </value>
-        public bool PropagatesToInstance 
+        public bool PropagatesToInstance
         {
-            get {
+            get
+            {
                 RefreshQualifierInfo();
                 return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_FLAG_PROPAGATE_TO_INSTANCE ==
                     (qualifierFlavor & (int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_FLAG_PROPAGATE_TO_INSTANCE));
             }
-            set {
+            set
+            {
                 int status = (int)ManagementStatus.NoError;
 
-                RefreshQualifierInfo ();
+                RefreshQualifierInfo();
                 // Mask out origin bits 
                 int flavor = qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN;
 
@@ -300,17 +307,19 @@ namespace System.Management
         /// <para><see langword='true'/> if the qualifier should be 
         ///    propagated to subclasses of this class; otherwise, <see langword='false'/>.</para>
         /// </value>
-        public bool PropagatesToSubclass 
+        public bool PropagatesToSubclass
         {
-            get {
+            get
+            {
                 RefreshQualifierInfo();
                 return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_FLAG_PROPAGATE_TO_DERIVED_CLASS ==
                     (qualifierFlavor & (int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_FLAG_PROPAGATE_TO_DERIVED_CLASS));
             }
-            set {
+            set
+            {
                 int status = (int)ManagementStatus.NoError;
 
-                RefreshQualifierInfo ();
+                RefreshQualifierInfo();
                 // Mask out origin bits 
                 int flavor = qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN;
 
@@ -336,20 +345,22 @@ namespace System.Management
         /// <para><see langword='true'/> if the value of the qualifier 
         ///    can be overridden when propagated; otherwise, <see langword='false'/>.</para>
         /// </value>
-        public bool IsOverridable 
+        public bool IsOverridable
         {
-            get {
+            get
+            {
                 RefreshQualifierInfo();
-                return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_OVERRIDABLE == 
+                return ((int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_OVERRIDABLE ==
                     (qualifierFlavor & (int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_PERMISSIONS));
             }
-            set {
+            set
+            {
                 int status = (int)ManagementStatus.NoError;
 
-                RefreshQualifierInfo ();
+                RefreshQualifierInfo();
                 // Mask out origin bits 
                 int flavor = qualifierFlavor & ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_MASK_ORIGIN;
-                    
+
                 if (value)
                     flavor &= ~(int)tag_WBEM_FLAVOR_TYPE.WBEM_FLAVOR_NOT_OVERRIDABLE;
                 else

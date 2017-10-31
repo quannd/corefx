@@ -46,11 +46,11 @@ namespace System.Management
     ///    </code>
     /// </example>
     //CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC//
-    public class MethodDataCollection : ICollection, IEnumerable 
+    public class MethodDataCollection : ICollection, IEnumerable
     {
         private ManagementObject parent;
 
-        private class enumLock 
+        private class enumLock
         {
         } //used to lock usage of BeginMethodEnum/NextMethod
 
@@ -69,9 +69,9 @@ namespace System.Management
         /// <value>
         /// <para> The number of objects in the <see cref='System.Management.MethodDataCollection'/>. </para>
         /// </value>
-        public int Count 
+        public int Count
         {
-            get 
+            get
             {
                 int i = 0;
                 IWbemClassObjectFreeThreaded inParameters = null, outParameters = null;
@@ -79,10 +79,10 @@ namespace System.Management
                 int status = (int)ManagementStatus.Failed;
 
 #pragma warning disable CA2002
-                lock(typeof(enumLock))
+                lock (typeof(enumLock))
 #pragma warning restore CA2002
                 {
-                    try 
+                    try
                     {
                         status = parent.wbemObject.BeginMethodEnumeration_(0);
 
@@ -91,15 +91,17 @@ namespace System.Management
                             methodName = "";    // Condition primer to branch into the while loop.
                             while (methodName != null && status >= 0 && status != (int)tag_WBEMSTATUS.WBEM_S_NO_MORE_DATA)
                             {
-                                methodName = null; inParameters = null; outParameters = null;
+                                methodName = null;
+                                inParameters = null;
+                                outParameters = null;
                                 status = parent.wbemObject.NextMethod_(0, out methodName, out inParameters, out outParameters);
                                 if (status >= 0 && status != (int)tag_WBEMSTATUS.WBEM_S_NO_MORE_DATA)
                                     i++;
                             }
                             parent.wbemObject.EndMethodEnumeration_();  // Ignore status.
                         }
-                    } 
-                    catch (COMException e) 
+                    }
+                    catch (COMException e)
                     {
                         ManagementException.ThrowWithExtendedInfo(e);
                     }
@@ -125,7 +127,9 @@ namespace System.Management
         /// <para><see langword='true'/> if the object is synchronized; 
         ///    otherwise, <see langword='false'/>.</para>
         /// </value>
-        public bool IsSynchronized { get { return false; } 
+        public bool IsSynchronized
+        {
+            get { return false; }
         }
 
         /// <summary>
@@ -134,7 +138,9 @@ namespace System.Management
         /// <value>
         ///    <para>The object to be used for synchronization.</para>
         /// </value>
-        public object SyncRoot { get { return this; } 
+        public object SyncRoot
+        {
+            get { return this; }
         }
 
         /// <overload>
@@ -249,16 +255,16 @@ namespace System.Management
             internal MethodDataEnumerator(ManagementObject parent)
             {
                 this.parent = parent;
-                methodNames = new ArrayList(); 
+                methodNames = new ArrayList();
                 IWbemClassObjectFreeThreaded inP = null, outP = null;
                 string tempMethodName;
                 int status = (int)ManagementStatus.Failed;
 
 #pragma warning disable CA2002
-                lock(typeof(enumLock))
+                lock (typeof(enumLock))
 #pragma warning restore CA2002
                 {
-                    try 
+                    try
                     {
                         status = parent.wbemObject.BeginMethodEnumeration_(0);
 
@@ -274,14 +280,14 @@ namespace System.Management
                             }
                             parent.wbemObject.EndMethodEnumeration_();  // Ignore status.
                         }
-                    } 
-                    catch (COMException e) 
+                    }
+                    catch (COMException e)
                     {
                         ManagementException.ThrowWithExtendedInfo(e);
                     }
                     en = methodNames.GetEnumerator();
                 }
-                
+
                 if ((status & 0xfffff000) == 0x80041000)
                 {
                     ManagementException.ThrowWithExtendedInfo((ManagementStatus)status);
@@ -291,7 +297,7 @@ namespace System.Management
                     Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
                 }
             }
-        
+
             /// <internalonly/>
             object IEnumerator.Current { get { return (object)this.Current; } }
 
@@ -300,11 +306,11 @@ namespace System.Management
             /// enumeration.</para>
             /// </summary>
             /// <value>The current <see cref='System.Management.MethodData'/> item in the collection.</value>
-            public MethodData Current 
+            public MethodData Current
             {
-                get 
+                get
                 {
-                        return new MethodData(parent, (string)en.Current);
+                    return new MethodData(parent, (string)en.Current);
                 }
             }
 
@@ -312,9 +318,9 @@ namespace System.Management
             /// <para>Moves to the next element in the <see cref='System.Management.MethodDataCollection'/> enumeration.</para>
             /// </summary>
             /// <returns><see langword='true'/> if the enumerator was successfully advanced to the next method; <see langword='false'/> if the enumerator has passed the end of the collection.</returns>
-            public bool MoveNext ()
+            public bool MoveNext()
             {
-                return en.MoveNext();           
+                return en.MoveNext();
             }
 
             /// <summary>
@@ -324,7 +330,7 @@ namespace System.Management
             {
                 en.Reset();
             }
-            
+
         }//MethodDataEnumerator
 
 
@@ -337,17 +343,17 @@ namespace System.Management
         /// </summary>
         /// <param name='methodName'>The name of the method requested.</param>
         /// <value>A <see cref='System.Management.MethodData'/> instance containing all information about the specified method.</value>
-        public virtual MethodData this[string methodName] 
+        public virtual MethodData this[string methodName]
         {
-            get 
-            { 
+            get
+            {
                 if (null == methodName)
-                    throw new ArgumentNullException ("methodName");
+                    throw new ArgumentNullException("methodName");
 
                 return new MethodData(parent, methodName);
             }
         }
-        
+
 
         /// <summary>
         /// <para>Removes a <see cref='System.Management.MethodData'/> from the <see cref='System.Management.MethodDataCollection'/>.</para>
@@ -366,11 +372,11 @@ namespace System.Management
 
             int status = (int)ManagementStatus.Failed;
 
-            try 
+            try
             {
                 status = parent.wbemObject.DeleteMethod_(methodName);
-            } 
-            catch (COMException e) 
+            }
+            catch (COMException e)
             {
                 ManagementException.ThrowWithExtendedInfo(e);
             }
@@ -433,11 +439,11 @@ namespace System.Management
 
             int status = (int)ManagementStatus.Failed;
 
-            try 
+            try
             {
                 status = parent.wbemObject.PutMethod_(methodName, 0, wbemIn, wbemOut);
-            } 
-            catch (COMException e) 
+            }
+            catch (COMException e)
             {
                 ManagementException.ThrowWithExtendedInfo(e);
             }

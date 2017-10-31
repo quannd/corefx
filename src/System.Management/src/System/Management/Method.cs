@@ -118,11 +118,11 @@ namespace System.Management
         {
             int status = (int)ManagementStatus.Failed;
 
-            try 
+            try
             {
                 status = parent.wbemObject.GetMethod_(methodName, 0, out wmiInParams, out wmiOutParams);
-            } 
-            catch (COMException e) 
+            }
+            catch (COMException e)
             {
                 ManagementException.ThrowWithExtendedInfo(e);
             }
@@ -143,7 +143,7 @@ namespace System.Management
         /// <value>
         ///    <para>The name of the method.</para>
         /// </value>
-        public string Name 
+        public string Name
         {
             get { return methodName != null ? methodName : ""; }
         }
@@ -165,12 +165,13 @@ namespace System.Management
         ///    <see langword='ID'/> 
         ///    qualifier, identifying the order of the parameters in the method call.</para>
         /// </remarks>
-        public ManagementBaseObject InParameters 
+        public ManagementBaseObject InParameters
         {
-            get 
-            { 
+            get
+            {
                 RefreshMethodInfo();
-                return (null == wmiInParams) ? null : new ManagementBaseObject(wmiInParams); }
+                return (null == wmiInParams) ? null : new ManagementBaseObject(wmiInParams);
+            }
         }
 
         /// <summary>
@@ -191,12 +192,13 @@ namespace System.Management
         ///       object and
         ///       holds the return value of the method.</para>
         /// </remarks>
-        public ManagementBaseObject OutParameters 
+        public ManagementBaseObject OutParameters
         {
-            get 
-            { 
+            get
+            {
                 RefreshMethodInfo();
-                return (null == wmiOutParams) ? null : new ManagementBaseObject(wmiOutParams); }
+                return (null == wmiOutParams) ? null : new ManagementBaseObject(wmiOutParams);
+            }
         }
 
         /// <summary>
@@ -207,9 +209,9 @@ namespace System.Management
         ///    A string representing the originating
         ///    management class name.
         /// </value>
-        public string Origin 
+        public string Origin
         {
-            get 
+            get
             {
                 string className = null;
                 int status = parent.wbemObject.GetMethodOrigin_(methodName, out className);
@@ -239,9 +241,9 @@ namespace System.Management
         ///    qualifiers for this method.
         /// </value>
         /// <seealso cref='System.Management.QualifierData'/>
-        public QualifierDataCollection Qualifiers 
+        public QualifierDataCollection Qualifiers
         {
-            get 
+            get
             {
                 if (qualifiers == null)
                     qualifiers = new QualifierDataCollection(parent, methodName, QualifierType.MethodQualifier);

@@ -2,12 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System.Diagnostics;
 using Xunit;
 
 namespace System.Management.Tests
 {
     public class ManagementObjectTests
     {
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsWindowsNanoServer))]
+        public void PlatformNotSupportedOnNano()
+        {
+            Assert.Throws<PlatformNotSupportedException>(() => new ManagementObject($"Win32_LogicalDisk.DeviceID=\"{WmiTestHelper.SystemDriveId}\""));
+        }
+
         [ConditionalFact(typeof(WmiTestHelper), nameof(WmiTestHelper.IsWmiSupported))]
         public void Get_Win32_LogicalDisk()
         {
@@ -63,13 +70,22 @@ namespace System.Management.Tests
             var processId = (uint)methodArgs[3];
             Assert.True(0u != processId, $"Unexpected process ID: {processId}");
 
-            var process = new ManagementObject($"Win32_Process.Handle=\"{processId}\"");
-            resultObj = process.InvokeMethod("Terminate", new object[]{ 0 });
-            resultCode = (uint)resultObj;
-            Assert.Equal(0u, resultCode);
+            // Before terminating the process open a handle to it so the processId cannot be re-used until
+            // it is disposed. This ensures that the processId is not re-used right after the call to Terminate
+            // and the expected exception is always thrown.
+            using (Process targetProcess = Process.GetProcessById((int)processId))
+            {
+                Assert.False(targetProcess.HasExited);
 
-            ManagementException managementException = Assert.Throws<ManagementException>(() => process.Get());
-            Assert.Equal(ManagementStatus.NotFound, managementException.ErrorCode);
+                var process = new ManagementObject($"Win32_Process.Handle=\"{processId}\"");
+                resultObj = process.InvokeMethod("Terminate", new object[]{ 0 });
+                resultCode = (uint)resultObj;
+                Assert.Equal(0u, resultCode);
+                Assert.True(targetProcess.HasExited);
+
+                ManagementException managementException = Assert.Throws<ManagementException>(() => process.Get());
+                Assert.Equal(ManagementStatus.NotFound, managementException.ErrorCode);
+            }
         }
     }
 }

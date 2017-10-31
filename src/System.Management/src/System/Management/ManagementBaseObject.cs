@@ -5,14 +5,13 @@
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 namespace System.Management
 {
     /// <summary>
     /// <para>Describes the possible text formats that can be used with <see cref='System.Management.ManagementBaseObject.GetText'/>.</para>
     /// </summary>
-    public enum TextFormat 
+    public enum TextFormat
     {
         /// <summary>
         /// Managed Object Format
@@ -28,11 +27,11 @@ namespace System.Management
         /// </summary>
         WmiDtd20 = 2
     };
-        
+
     /// <summary>
     ///    <para>Describes the possible CIM types for properties, qualifiers, or method parameters.</para>
     /// </summary>
-    public enum CimType 
+    public enum CimType
     {
         /// <summary>
         ///    <para>Invalid Type</para>
@@ -160,8 +159,8 @@ namespace System.Management
         /// </summary>
         IgnoreFlavor = 0x20
     };
-        
-        
+
+
     internal enum QualifierType
     {
         ObjectQualifier,
@@ -203,7 +202,7 @@ namespace System.Management
                 {
                     Initialize(true);
                 }
-                return _wbemObject; 
+                return _wbemObject;
             }
             set
             {
@@ -211,12 +210,12 @@ namespace System.Management
             }
         }
 
-        internal IWbemClassObjectFreeThreaded _wbemObject ;
+        internal IWbemClassObjectFreeThreaded _wbemObject;
 
         private PropertyDataCollection properties;
         private PropertyDataCollection systemProperties;
         private QualifierDataCollection qualifiers;
- 
+
         /// <summary>
         /// <para>Initializes a new instance of the <see cref='System.Management.ManagementBaseObject'/> class that is serializable.</para>
         /// </summary>
@@ -252,7 +251,7 @@ namespace System.Management
         /// </remarks>
         public static explicit operator IntPtr(ManagementBaseObject managementObject)
         {
-            if(null == managementObject)
+            if (null == managementObject)
                 return IntPtr.Zero;
 
             return (IntPtr)managementObject.wbemObject;
@@ -277,7 +276,7 @@ namespace System.Management
         /// <param name="scope"> The scope</param>
         internal static ManagementBaseObject GetBaseObject(
             IWbemClassObjectFreeThreaded wbemObject,
-            ManagementScope scope) 
+            ManagementScope scope)
         {
             ManagementBaseObject newObject = null;
 
@@ -290,7 +289,7 @@ namespace System.Management
         }
 
         //Constructor
-        internal ManagementBaseObject(IWbemClassObjectFreeThreaded wbemObject) 
+        internal ManagementBaseObject(IWbemClassObjectFreeThreaded wbemObject)
         {
             this.wbemObject = wbemObject;
             properties = null;
@@ -321,7 +320,7 @@ namespace System.Management
             return new ManagementBaseObject(theClone);
         }
 
-        internal virtual void Initialize ( bool getObject ) {}
+        internal virtual void Initialize(bool getObject) { }
 
         //
         //Properties
@@ -336,11 +335,11 @@ namespace System.Management
         ///    properties of the management object.</para>
         /// </value>
         /// <seealso cref='System.Management.PropertyData'/>
-        public virtual PropertyDataCollection Properties 
+        public virtual PropertyDataCollection Properties
         {
-            get 
-            { 
-                Initialize ( true ) ;
+            get
+            {
+                Initialize(true);
 
                 if (properties == null)
                     properties = new PropertyDataCollection(this, false);
@@ -358,11 +357,11 @@ namespace System.Management
         /// <para>A <see cref='System.Management.PropertyDataCollection'/> that represents the system properties of the management object.</para>
         /// </value>
         /// <seealso cref='System.Management.PropertyData'/>
-        public virtual PropertyDataCollection SystemProperties 
+        public virtual PropertyDataCollection SystemProperties
         {
-            get 
+            get
             {
-                Initialize ( false ) ;
+                Initialize(false);
 
                 if (systemProperties == null)
                     systemProperties = new PropertyDataCollection(this, true);
@@ -381,11 +380,11 @@ namespace System.Management
         ///    defined on the management object.</para>
         /// </value>
         /// <seealso cref='System.Management.QualifierData'/>
-        public virtual QualifierDataCollection Qualifiers 
+        public virtual QualifierDataCollection Qualifiers
         {
-            get 
-            { 
-                Initialize ( true ) ;
+            get
+            {
+                Initialize(true);
 
                 if (qualifiers == null)
                     qualifiers = new QualifierDataCollection(this);
@@ -405,10 +404,10 @@ namespace System.Management
         ///       'C:' object, the class path is \\MyBox\root\cimv2:Win32_LogicalDisk
         ///       .</para>
         /// </example>
-        public virtual ManagementPath ClassPath 
-        { 
-            get 
-            { 
+        public virtual ManagementPath ClassPath
+        {
+            get
+            {
                 Object serverName = null;
                 Object scopeName = null;
                 Object className = null;
@@ -417,7 +416,7 @@ namespace System.Management
                 int status = (int)ManagementStatus.NoError;
 
                 status = wbemObject.Get_("__SERVER", 0, ref serverName, ref propertyType, ref propertyFlavor);
-                
+
                 if (status == (int)ManagementStatus.NoError)
                 {
                     status = wbemObject.Get_("__NAMESPACE", 0, ref scopeName, ref propertyType, ref propertyFlavor);
@@ -442,18 +441,18 @@ namespace System.Management
                 classPath.ClassName = String.Empty;
 
                 // Some of these may throw if they are NULL
-                try 
+                try
                 {
                     classPath.Server = (string)(serverName is System.DBNull ? "" : serverName);
                     classPath.NamespacePath = (string)(scopeName is System.DBNull ? "" : scopeName);
                     classPath.ClassName = (string)(className is System.DBNull ? "" : className);
-                } 
+                }
                 catch
                 {
                 }
 
                 return classPath;
-            } 
+            }
         }
 
 
@@ -472,23 +471,23 @@ namespace System.Management
         ///    An <see cref='System.Object'/> containing the
         ///    value of the requested property.
         /// </value>
-        public Object this[string propertyName] 
-        { 
+        public Object this[string propertyName]
+        {
             get { return GetPropertyValue(propertyName); }
-            set 
-            { 
-                Initialize ( true ) ;
-                try 
+            set
+            {
+                Initialize(true);
+                try
                 {
-                    SetPropertyValue (propertyName, value);
+                    SetPropertyValue(propertyName, value);
                 }
-                catch (COMException e) 
+                catch (COMException e)
                 {
                     ManagementException.ThrowWithExtendedInfo(e);
                 }
             }
         }
-        
+
         //******************************************************
         //GetPropertyValue
         //******************************************************
@@ -500,12 +499,12 @@ namespace System.Management
         ///    <para>The value of the specified property.</para>
         /// </returns>
         public Object GetPropertyValue(string propertyName)
-        { 
+        {
             if (null == propertyName)
-                throw new ArgumentNullException ("propertyName");
+                throw new ArgumentNullException("propertyName");
 
             // Check for system properties
-            if (propertyName.StartsWith ("__", StringComparison.Ordinal))
+            if (propertyName.StartsWith("__", StringComparison.Ordinal))
                 return SystemProperties[propertyName].Value;
             else
                 return Properties[propertyName].Value;
@@ -523,7 +522,7 @@ namespace System.Management
         /// </returns>
         public Object GetQualifierValue(string qualifierName)
         {
-            return Qualifiers [qualifierName].Value;
+            return Qualifiers[qualifierName].Value;
         }
 
         //******************************************************
@@ -536,10 +535,10 @@ namespace System.Management
         /// <param name='qualifierValue'>The value to set.</param>
         public void SetQualifierValue(string qualifierName, object qualifierValue)
         {
-            Qualifiers [qualifierName].Value = qualifierValue;
+            Qualifiers[qualifierName].Value = qualifierValue;
         }
-            
-        
+
+
         //******************************************************
         //GetPropertyQualifierValue
         //******************************************************
@@ -591,9 +590,9 @@ namespace System.Management
             // Removed Initialize call since wbemObject is a property that will call Initialize ( true ) on
             // its getter.
             //
-            switch(format)
+            switch (format)
             {
-                case TextFormat.Mof :
+                case TextFormat.Mof:
 
                     status = wbemObject.GetObjectText_(0, out objText);
 
@@ -607,9 +606,9 @@ namespace System.Management
 
                     return objText;
 
-                case TextFormat.CimDtd20 :
-                case TextFormat.WmiDtd20 :
-                    
+                case TextFormat.CimDtd20:
+                case TextFormat.WmiDtd20:
+
                     //This may throw on non-XP platforms... - should we catch ?
                     IWbemObjectTextSrc wbemTextSrc = (IWbemObjectTextSrc)new WbemObjectTextSrc();
                     IWbemContext ctx = (IWbemContext)new WbemContext();
@@ -619,10 +618,10 @@ namespace System.Management
 
                     if (wbemTextSrc != null)
                     {
-                        status = wbemTextSrc.GetText_(0, 
-                            (IWbemClassObject_DoNotMarshal)(Marshal.GetObjectForIUnknown(wbemObject)), 
+                        status = wbemTextSrc.GetText_(0,
+                            (IWbemClassObject_DoNotMarshal)(Marshal.GetObjectForIUnknown(wbemObject)),
                             (uint)format, //note: this assumes the format enum has the same values as the underlying WMI enum !!
-                            ctx, 
+                            ctx,
                             out objText);
                         if (status < 0)
                         {
@@ -635,7 +634,7 @@ namespace System.Management
 
                     return objText;
 
-                default : 
+                default:
 
                     return null;
             }
@@ -653,12 +652,12 @@ namespace System.Management
         public override bool Equals(object obj)
         {
             bool result = false;
-            
-            try 
+
+            try
             {
                 if (obj is ManagementBaseObject)
                 {
-                    result = CompareTo ((ManagementBaseObject)obj, ComparisonSettings.IncludeAll);
+                    result = CompareTo((ManagementBaseObject)obj, ComparisonSettings.IncludeAll);
                 }
                 else
                 {
@@ -739,15 +738,15 @@ namespace System.Management
         public bool CompareTo(ManagementBaseObject otherObject, ComparisonSettings settings)
         {
             if (null == otherObject)
-                throw new ArgumentNullException ("otherObject");
+                throw new ArgumentNullException("otherObject");
 
             bool result = false;
 
             if (null != wbemObject)
             {
-                int status = (int) ManagementStatus.NoError;
+                int status = (int)ManagementStatus.NoError;
 
-                status = wbemObject.CompareTo_((int) settings, otherObject.wbemObject);
+                status = wbemObject.CompareTo_((int)settings, otherObject.wbemObject);
 
                 if ((int)ManagementStatus.Different == status)
                     result = false;
@@ -758,19 +757,19 @@ namespace System.Management
                 else if (status < 0)
                     Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
             }
-            
+
             return result;
         }
 
         internal string ClassName
         {
-            get 
+            get
             {
                 object val = null;
                 int dummy1 = 0, dummy2 = 0;
                 int status = (int)ManagementStatus.NoError;
 
-                status = wbemObject.Get_ ("__CLASS", 0, ref val, ref dummy1, ref dummy2);
+                status = wbemObject.Get_("__CLASS", 0, ref val, ref dummy1, ref dummy2);
 
                 if (status < 0)
                 {
@@ -783,7 +782,7 @@ namespace System.Management
                 if (val is System.DBNull)
                     return String.Empty;
                 else
-                    return ((string) val);
+                    return ((string)val);
             }
         }
 
@@ -801,13 +800,13 @@ namespace System.Management
                 else
                     Marshal.ThrowExceptionForHR(status, WmiNetUtilsHelper.GetErrorInfo_f());
             }
-            
+
             return ((int)val == (int)tag_WBEM_GENUS_TYPE.WBEM_GENUS_CLASS);
         }
 
         internal bool IsClass
         {
-            get 
+            get
             {
                 return _IsClass(wbemObject);
             }
@@ -818,19 +817,19 @@ namespace System.Management
         /// </summary>
         /// <param name='propertyName'>The name of the property to be changed.</param>
         /// <param name='propertyValue'>The new value for this property.</param>
-        public void SetPropertyValue (
+        public void SetPropertyValue(
             string propertyName,
             object propertyValue)
         {
             if (null == propertyName)
-                throw new ArgumentNullException ("propertyName");
+                throw new ArgumentNullException("propertyName");
 
             // Check for system properties
-            if (propertyName.StartsWith ("__", StringComparison.Ordinal))
+            if (propertyName.StartsWith("__", StringComparison.Ordinal))
                 SystemProperties[propertyName].Value = propertyValue;
             else
                 Properties[propertyName].Value = propertyValue;
         }
-        
+
     }//ManagementBaseObject
 }
