@@ -2,12 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using Microsoft.Win32.SafeHandles;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using System.Security;
+using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using Microsoft.Win32.SafeHandles;
 
 namespace System.IO.Pipes
 {
@@ -24,6 +24,14 @@ namespace System.IO.Pipes
         private bool TryConnect(int timeout, CancellationToken cancellationToken)
         {
             Interop.Kernel32.SECURITY_ATTRIBUTES secAttrs = PipeStream.GetSecAttrs(_inheritability);
+
+            if ((_pipeOptions & PipeOptions.CurrentUserOnly) != 0)
+            {
+                // We need to remove this flag from options because it is not a valid flag for windows PInvoke to create a pipe.
+                _pipeOptions &= ~PipeOptions.CurrentUserOnly;
+            }
+
+            Debug.Assert((options & PipeOptions.CurrentUserOnly) == 0);
 
             int _pipeFlags = (int)_pipeOptions;
             if (_impersonationLevel != TokenImpersonationLevel.None)
@@ -99,10 +107,10 @@ namespace System.IO.Pipes
                 }
             }
 
-            // Success! 
+            // Success!
             InitializeHandle(handle, false, (_pipeOptions & PipeOptions.Asynchronous) != 0);
             State = PipeState.Connected;
-
+            ValidateRemotePipeUser();
             return true;
         }
 
@@ -126,6 +134,21 @@ namespace System.IO.Pipes
                 }
 
                 return numInstances;
+            }
+        }
+
+        private void ValidateRemotePipeUser()
+        {
+            if (!IsCurrentUserOnly)
+                return;
+
+            SecurityIdentifier currentUserSid = WindowsIdentity.GetCurrent().Owner;
+            PipeSecurity accessControl = this.GetAccessControl();
+            IdentityReference remoteOwnerSid = accessControl.GetOwner(typeof(SecurityIdentifier));
+            if (remoteOwnerSid != currentUserSid)
+            {
+                State = PipeState.Closed;
+                throw new UnauthorizedAccessException(SR.UnauthorizedAccess_NotOwnedByCurrentUser);
             }
         }
 
